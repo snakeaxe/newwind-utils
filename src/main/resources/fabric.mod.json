@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "newwindutils",
+  "version": "${version}",
+  "name": "NewwindUtils",
+  "description": "Client-side Fabric cooldown and bind tracking for Newwind, with configurable HUDs, item registration, and timing tools.",
+  "authors": [
+    "snakeaxe"
+  ],
+  "contact": {
+    "homepage": "https://github.com/snakeaxe"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/newwindutils/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "newwindutils.NewwindUtils"
+    ],
+    "client": [
+      "newwindutils.client.NewwindUtilsClient"
+    ]
+  },
+  "mixins": [
+    "newwindutils.mixins.json",
+    {
+      "config": "newwindutils.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.20.1",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}

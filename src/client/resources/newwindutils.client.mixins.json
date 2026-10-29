@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "package": "newwindutils.client.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "ExampleClientMixin",
+    "PlayerNametagHudMixin",
+    "NametagTimerStateMixin",
+    "ClientPacketObservationMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
