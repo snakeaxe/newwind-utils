@@ -16,6 +16,8 @@ public final class CooldownObservations {
     public record Sample(String label, int ticks, boolean serverReported, String group) {}
     public record Candidate(String label, CustomItemRule rule) {}
     private static final Map<String,ActiveEffectTimer> active = new LinkedHashMap<>();
+    private static final Map<String,Set<EffectKind>> kinds = new LinkedHashMap<>();
+    private static final EnumMap<EffectKind,Long> authority = new EnumMap<>(EffectKind.class);
     private static final List<Sample> samples = new ArrayList<>();
     private static List<Candidate> lastHitItems = List.of();
     private static ClientLevel session;
@@ -26,33 +28,45 @@ public final class CooldownObservations {
 
     private static void ensureWorld(Minecraft client) {
         if (session != client.level) {
-            session=client.level; active.clear(); samples.clear(); lastHitItems=List.of();
+            session=client.level; active.clear(); kinds.clear(); authority.clear(); samples.clear(); lastHitItems=List.of();
             armed=false; measuringSince=-1; repeatedHit=false;
         }
     }
     public static void tick(Minecraft client) {
         ensureWorld(client);
         if (client.level==null || client.player==null) return;
-        active.values().removeIf(t -> t.remainingTicks(client.level.getGameTime())==0);
-        if (!client.player.isAlive()) { active.clear(); armed=false; measuringSince=-1; }
+        active.entrySet().removeIf(e -> e.getValue().remainingTicks(client.level.getGameTime())==0);
+        kinds.keySet().retainAll(active.keySet());
+        clearStalePredictions(client);
+        if (!client.player.isAlive()) { active.clear(); kinds.clear(); authority.clear(); armed=false; measuringSince=-1; }
     }
     public static void serverCooldown(ClientboundCooldownPacket packet) {
         Minecraft client=Minecraft.getInstance(); ensureWorld(client);
         if (client.level==null || client.player==null) return;
         String group=packet.cooldownGroup().toString();
-        if (packet.duration()<=0) { active.remove(group); return; }
+        if (packet.duration()<=0) { recordServer(group,"",0,client.level.getGameTime());clearStalePredictions(client);return; }
+        Set<EffectKind> affected=EnumSet.noneOf(EffectKind.class);
         String label=packet.cooldownGroup().getPath();
         for(int i=0;i<client.player.getInventory().getContainerSize();i++) {
             ItemStack stack=client.player.getInventory().getItem(i);
             if (!stack.isEmpty() && client.player.getCooldowns().getCooldownGroup(stack).equals(packet.cooldownGroup())) {
-                label=stack.getHoverName().getString(); break;
+                label=stack.getHoverName().getString();
+                EffectKind kind=EffectKind.ofCooldown(group,label,stack);
+                if(kind!=EffectKind.OTHER)affected.add(kind);
             }
         }
-        recordServer(group,label,packet.duration(),client.level.getGameTime());
+        if(affected.isEmpty())affected.add(EffectKind.ofCooldownName(group+" "+label));
+        recordServer(group,label,packet.duration(),client.level.getGameTime(),affected);
+        clearStalePredictions(client);
     }
     // Kept independent of packet/client objects to make exact duration/reset behavior verifiable.
     static void recordServer(String group, String label, int ticks, long now) {
-        if (ticks<=0) { active.remove(group); return; }
+        recordServer(group,label,ticks,now,Set.of(EffectKind.ofCooldownName(group+" "+label)));
+    }
+    static void recordServer(String group,String label,int ticks,long now,Set<EffectKind> affected){
+        if (ticks<=0) { active.remove(group);kinds.remove(group);return; }
+        kinds.put(group,Set.copyOf(affected));
+        for(EffectKind kind:affected)if(kind!=EffectKind.OTHER)authority.put(kind,now);
         active.put(group,new ActiveEffectTimer("server:"+group,"Server: "+label,ticks,now+ticks,null));
         remember(new Sample(label+" ["+group+"]",ticks,true,group));
     }
@@ -64,6 +78,24 @@ public final class CooldownObservations {
     public static List<Candidate> lastHitItems() { return List.copyOf(lastHitItems); }
     public static List<ActiveEffectTimer> activeTimers(long now) {
         return active.values().stream().filter(t->t.remainingTicks(now)>0).toList();
+    }
+    public static List<ActiveEffectTimer> selfTimers(List<ActiveEffectTimer> predicted,NewwindUtilsConfig config,long now){
+        List<SelfEffectSummary.Evidence> evidence=new ArrayList<>();
+        if(config.showServerCooldowns) for(var entry:active.entrySet()) for(EffectKind kind:kinds.getOrDefault(entry.getKey(),Set.of()))
+            evidence.add(new SelfEffectSummary.Evidence(kind,entry.getValue()));
+        List<ActiveEffectTimer> result=SelfEffectSummary.summarize(predicted,evidence,
+                config.showServerCooldowns?authority:Map.of(),config,now);
+        if(config.showRawSelfCooldowns && config.showServerCooldowns)result.addAll(activeTimers(now));
+        return result;
+    }
+    private static void clearStalePredictions(Minecraft client){
+        if(client.player==null || client.level==null)return;
+        long now=client.level.getGameTime();
+        for(var entry:authority.entrySet()){
+            EffectKind kind=entry.getKey();
+            boolean stillActive=active.entrySet().stream().anyMatch(e->e.getValue().remainingTicks(now)>0 && kinds.getOrDefault(e.getKey(),Set.of()).contains(kind));
+            if(!stillActive)NewwindUtilsClient.getTimerManager().clearPredictedBefore(client.player,kind,entry.getValue()+8);
+        }
     }
     public static void incomingHit(ClientboundDamageEventPacket packet) {
         Minecraft client=Minecraft.getInstance(); ensureWorld(client);

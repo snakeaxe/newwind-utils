@@ -103,11 +103,6 @@ public class NewwindUtilsSelfHud {
             long currentGameTime,
             NewwindUtilsConfig config
     ) {
-        if (config.timerDisplayMode.showsSeconds()) {
-            return timer.displayName() + ": " +
-                    String.format(Locale.US, "%.1fs", timer.remainingSeconds(currentGameTime));
-        }
-
-        return timer.displayName();
+        return timer.displayName()+": "+String.format(Locale.US,"%.1fs",timer.remainingSeconds(currentGameTime));
     }
 }

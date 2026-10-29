@@ -1,63 +1,178 @@
-NewwindUtils 1.0.3 — appearance editor and preview
+NEWWIND UTILS 1.1.2 — KEY DROPS AND LANDED HELIAST POOLS
 
-WHAT CHANGED
-- Target HUD mode is pinned as the first control and remains visible when paging.
-- Screen HUD mode shows screen-panel appearance controls. Above nametag mode shows nametag controls. Controls that do not apply are hidden.
-- Nametag appearance options include size, height, stacked/one-line layout, line spacing, decimal precision, preset/custom RGB colors, remaining-time colors, bold, shadow, and background opacity.
-- Nametag colors and style are independent of the screen panel's palette.
-- A live sample preview is visible while editing. On smaller screens it sits above the controls. Sliders update it as you drag.
-- Full screen previews show screen/self panels at their configured screen positions. Return to the editor with Back to editor or Escape.
-- The nametag preview includes an example player name and cosmetic title to help judge clearance. It is an illustrative fixed-distance scene; actual in-world size depends on player distance and view angle.
-- Animate toggles sample countdowns and time colors. Frozen sample values are the default for easy styling.
-- Previews use isolated sample data. They do not start, refresh, remove, or save actual cooldown timers. Real timer visuals are temporarily suppressed while editing/previewing; the underlying tracking continues.
-- Self HUD settings have their own page and preview. The screen/self panels retain their existing shared palette, scale, text-shadow, and timer-display settings.
-- Reset look restores only appearance settings for the selected view. Registered custom items, effect durations, and targeting preferences are retained.
+INSTALL
+Close Minecraft, replace the previous NewwindUtils JAR in Prism's Mods tab
+with newwindutils-1.1.2.jar, and launch. Keep one NewwindUtils JAR.
+Existing settings, item identities, durations and other radius rules remain.
 
-INSTALL AND TRY
-Close Minecraft, replace the old NewwindUtils JAR with newwindutils-1.0.3.jar, and launch Minecraft. Keep one NewwindUtils JAR in mods.
-Press U. The first button switches between Screen HUD and Above nametag.
-Change sliders or click options and watch the preview. Double-click numeric sliders for exact input. Page through appearance controls as needed; the mode selector and preview remain visible.
-Use Full screen to check the screen HUD position without fighting another player. For self-panel editing choose Self HUD settings. Custom Items / Measurements and common targeting controls are below appearance settings (page through if needed).
-Nametag Background Opacity runs from 0 (transparent) to 255 (opaque). Custom RGB channels use 0 to 255. Line Spacing is hidden for the one-line layout; RGB/presets are hidden while remaining-time colors are enabled.
+KEY DROP BROWSER
+Press B > Keys > select a key > View drops.
+Every entry in the drop list is clickable. It opens the normal item detail
+page with its effects, upgrades, costs and source wiki link.
+Back (or Escape) returns to the same drop list and page. Back to key returns
+to the key's page. Search on a drop list filters just that key's drops.
+The compact category-first browser and inventory item trim icons remain.
+
+The data contains 410 explicit key-to-item links for 20 keys, compiled by
+reading each catalog item's wiki Obtaining list. No entire categories or
+unpublished odds were guessed. This is every drop documented by these links,
+not a guarantee of an exhaustive current server loot table.
+Prisma Dungeon Key and legacy Voting Key have no published matching links in
+this snapshot; their lists explicitly say no drops are documented.
+Ordinary Voting key drops map to Voting Key, not the legacy copy.
+The wiki snapshot is dated October 29, 2026. Individual drop pages retain
+source URLs so you can verify how an item is obtained.
+
+HELIAST — AFTER IMPACT ONLY
+Heliast no longer draws any manually configured circle at your feet, even
+if an old rule was set to ALWAYS. Other item circles retain their settings.
+Its Radius button now toggles Landed pool outlines.
+Draw/release your Heliast and shoot it at the ground. The mod watches for the
+new projectile from that release, then a new lingering area cloud at its
+impact. Once associated, a circle uses that cloud's real world position and
+current server-synced radius. It does not follow the player. It disappears
+when the cloud is removed and updates when the cloud radius changes.
+No circle is drawn for simply holding the bow or while a projectile flies.
+It accepts ordinary lingering-potion clouds as well as dragon-breath visuals;
+it does not depend on Minecraft's particle visibility setting.
+
+This still requires an in-game Newwind test. The client must receive the
+projectile and an AreaEffectCloud entity; particle-only server pools cannot be
+outlined from their entity radius. Association uses projectile ownership when
+available, otherwise a short launch/proximity window; nearby simultaneous
+shots/pools can be ambiguous. The outline does not independently verify the
+server's healing logic. It follows pools associated with your Heliast shot,
+not all unrelated lingering potions or all dragon-breath clouds.
+
+RENAMED ITEMS / OTHER RADIUS GUIDES
+Renamed items can match their original item name, server cooldown identity,
+or unique mechanical lore. If needed, hold the item, open its correct browser
+page, and click Identify held item. Saved identity ignores the custom name.
+Other items: HELD shows the feet circle continuously while in either hand;
+INVENTORY while carried; WORN while equipped; ALWAYS permanently.
+Zero remains unknown/off. Tested base/upgraded values are still needed.
+
+TEST IN GAME
+1. B > Keys > Cabot Key > View drops > Heliast > Back > Back to key.
+2. Try a large key list: paging, search and Back should keep the list usable.
+3. Hold Heliast without shooting: no feet circle should appear.
+4. Fire at a visible nearby floor with particles ON; confirm the circle matches
+   the pool, then disable particles and repeat. Walk away: circle stays there.
+5. Let the pool expire: its ring should disappear. Other scythe/armor circles
+   should continue to work as before.
 
 VALIDATION
-All source compiled against the existing Minecraft 26.3/Fabric libraries with Java 25. Appearance checks passed for formatting, custom/time colors, bold, layout, background, immutable style snapshots, conditional setting visibility, appearance-only reset, old-config retention, responsive editor bounds at 320/360/440/640/960 widths and 240/360/600 heights, and isolated animated/frozen sample values. Earlier timer, item-rule, serialization, and server-cooldown checks passed as well.
-Visual rendering and mouse interactions still need an in-game check in your actual Minecraft instance. This JAR was packaged directly from the newly compiled Java 25 classes and project resources, using the same approach as versions 1.0.1 and 1.0.2; Gradle's local Minecraft preparation issue remains.
+All main/client Java source compiled with Java 25 against the existing
+Minecraft 26.3/Fabric dependencies. 451 drop-link/shot-association/landed-pool
+checks passed, as did 57 renamed-item/layout checks, 112 prior update checks,
+and the original timer/HUD checks. Packet/render hooks match this version.
+JAR was packaged from fresh compiled classes and resources. The prior local
+Gradle Minecraft-cache preparation issue remains; a full Gradle build was not
+verified here. The source retains the normal .\gradlew.bat build command.
+Real server clouds, UI interaction and shader/PvP-mod compatibility need your
+in-game test. The core guide below describes the other retained features.
 
-The item-registration and measurement instructions below still apply.
+NEWWIND UTILS 1.1.2 — TRYING THE UPDATE
 
-REGISTER AN ITEM
-1. Hold the item in your main hand and press K.
-2. Choose its effect: Bind, Elytra, Food only, Gapple, All food (includes gaps), or Custom timer label.
-3. Choose its source. Chest armor and leggings are detected automatically for held armor; you can change the source. Supported triggers are melee hits and right-clicking a player. Armor rules use melee hits.
-4. Set Seconds, or click Recent to choose a duration recorded from the server or your stopwatch. The rule supports 0.05 to 300 seconds, in 0.05-second steps.
-5. Optionally enter an exact lore line to distinguish upgraded variants that share the same item group.
-6. Click Save. The rule is stored in the normal mod configuration and is active immediately, including on nearby players whose visible held/equipped item matches it.
+INSTALL IN PRISM
+1. Close Minecraft.
+2. In Prism, right-click your Minecraft instance, choose Edit, then Mods.
+3. Remove the old NewwindUtils JAR from that instance. Keep only one version.
+4. Add newwindutils-1.1.2.jar and launch.
+Requires the existing Minecraft 26.3 setup, Fabric Loader 0.20.1 or newer,
+Fabric API for 26.3, and Java 25. This update does not change those requirements.
+Your existing configuration and custom item rules are retained.
 
-EDIT / DISABLE / DELETE
-Press U, then Custom Items / Measurements. Select a saved rule. Click its ON/OFF button or edit its fields and Save, or click Delete. Reset to Defaults preserves your custom item rules.
-Rules match the captured item type and its server cooldown group. For items without a cooldown group they match item type plus the captured displayed name, so they do not apply to every item of that base type.
-Register different effects for the same item as separate rules if needed. Existing built-in weapon rules remain available.
+SELF HUD
+The top-right self panel now combines affected movement items into one
+"Binded: 5.0s" line. Golden apples and enchanted golden apples share a separate
+"Gap binded" line. Elytra and ordinary food have their own lines. All always
+show seconds, even if your target HUD uses bars only.
+The longest live cooldown in a category determines its displayed duration.
+Actual server cooldown packets take priority over estimated hit timers.
+Cleared/expired server cooldowns do not reveal stale estimated timers again.
+As requested, a normal pearl, wind charge, rocket or chorus-fruit cooldown also
+counts as a movement bind. The client cannot distinguish every reason the
+server applies the same item cooldown. Missing/unrecognized groups may still
+need a captured sample from your server.
 
-MEASURE AN EFFECT AFTER AN INCOMING HIT
-1. Test with one player and one effect if possible.
-2. Press L before the hit. It arms the next server-reported player damage event against you.
-3. After the hit, wait until the effect actually ends, then press L again. A manual stopwatch sample is stored for this session. Pressing L a second time before a hit cancels the armed measurement.
-4. Press U > Custom Items / Measurements > Last incoming hit. Choose the visible weapon, chest armor, or leggings that you believe caused the effect. These are candidates, not automatic proof of the responsible item.
-5. In registration, click Recent and choose the stopwatch sample. Choose the appropriate effect/source, then Save.
-An additional hit during timing can refresh an effect; that sample is marked as containing extra hits. The stopwatch measures the duration you experience and includes your reaction time. The opponent's ability recharge can be different.
+Press U > Self HUD settings. Page through to "Show General bind", "Show Gap
+bind", "Show Elytra bind", "Show Food bind" and "Show Other effects".
+Click to hide/show each type. Hiding affects display only, not tracking.
+Raw cooldown details default OFF; enable them only if you want individual
+server item/group rows again. Target HUD has independent visibility switches.
+Existing screen/nametag modes, sliders, exact numeric entry and preview remain.
 
-AUTOMATIC LOCAL COOLDOWNS
-When Newwind sends a normal Minecraft item cooldown packet, the self HUD shows Server: <affected item/group> with that packet's duration. Updates can shorten or refresh it, and a server clear removes it early. Expired timers disappear normally. The Server Cooldowns setting controls this display.
-These durations also appear under Recent, labelled Server. Select a sample only when you know it corresponds to the effect you are registering. An item cooldown packet names the affected item/group; it does not identify the attacking weapon or armor. Ordinary item reuse cooldowns can appear here as well.
-The client receives these standard cooldowns for your own items. It cannot query private opponent cooldowns. Other-player effect timers continue to estimate from observed matching triggers and the saved rule duration. Hidden, random, or chance-based activation cannot be proven by a hit alone. Effects implemented entirely on the server without a cooldown packet need a known duration or a manual measurement.
-Recent duration samples and incoming item snapshots are session-only; saved item rules persist between launches. Disconnects/world changes clear the session. Death cancels an active stopwatch and clears active local server cooldowns.
+ITEM BROWSER AND UPGRADE COSTS
+Press B (rebind in Minecraft Controls if another mod uses B).
+Alternatively press U and page through to God Item Browser / Costs.
+Search by item name, effect, material or upgrade; click an item to read details.
+Look up held item recognizes the custom name/base material. Costs can start
+from that held item's actual Sharpness/Unbreaking levels or the wiki base item.
+Click Mode to choose ability upgrade, sharpening or reinforcing.
+Drag Current/Target sliders or double-click them to enter an exact level.
+Include base item adds one host item to the material list, separate from the
+copies sacrificed by a recipe. Disable it if you already own the host item.
+The ability calculator quotes one selected upgrade; removal refunds are not
+subtracted. A detected upgrade is based on the upgrade's name in item lore;
+if Newwind uses a different line, choose the current upgrade manually.
 
-KEYS
-U: settings
-K: register the item in your main hand
-L: arm/cancel/finish a received-effect measurement
-If another mod uses these keys, change them in Minecraft Options > Controls > Key Binds > NewwindUTILS.
+PLAYER-SUPPLIED LEVEL PRICES (editable under Price settings)
+Sharpness 10 -> 20: 90 embers per added level.
+Sharpness 20 -> 30: 90 dragon eggs per added level.
+Unbreaking 0 -> 10: 90 gold coins per added level.
+Unbreaking 10 -> 20: 90 star remnants per added level.
+4 embers = 1 degg; 64 degg = 1 stegg.
+Other level ranges are marked unpriced. Partial quotes are explicitly labeled
+INCOMPLETE and must not be treated as the full cost. No auction prices assumed.
+Example: Sharpness 10 -> 30 needs 900 embers plus 900 dragon eggs, equivalent
+to 17 stegg + 37 degg at those exchange rates.
 
-BUILD SOURCE
-Use the existing IDEA Java 25 setup and run .\gradlew.bat build.
+Wiki snapshot: October 29, 2026, from https://wiki.newwindserver.com/gods
+490 catalog entries / 392 upgrade recipes. Pursuit and Revelation had missing
+detail pages and are marked unavailable. Each item links its source wiki page.
+The catalog works offline. It is a standalone guide, not a JEI dependency or
+an item-spawning tool. Icons use the vanilla base material. Snapshot information
+can change; use the Wiki button to check the current page.
+
+RADIUS GUIDES
+Numeric radii were not published on the inspected Cupid's Scythe / Vest of
+Thorns pages, so all new radius values start at 0 (unknown, no circle).
+To try rendering: B > search your item > open it > Radius > set a positive test
+radius, e.g. 4 blocks. This is a test value, not a claim about its real range.
+Hold that item (Cupid) or wear it (Vest). A red ground outline should appear.
+Enter the real base/upgraded radii after testing the server's mechanic.
+Source options: HELD (either hand), WORN (armor), INVENTORY (carried).
+Variant AUTO uses the upgraded value when item lore names a radius upgrade;
+use BASE or UPGRADED explicitly if its lore is not recognized.
+An unknown upgraded value remains hidden instead of using the base value.
+U > Effect Radius Guides / B > Radius guides controls color, opacity and width.
+Disable a per-item rule or the global switch to hide the outlines.
+These are horizontal distance guides centered on you, following nearby ground
+surfaces. They do not prove a server hit occurred, predict a moving projectile's
+center, or represent the full vertical shape of an ability. Ground geometry,
+shader compatibility, and exact activation conditions need in-game testing.
+
+QUICK IN-GAME CHECK
+- Get hit with Stasis: one Binded countdown, rather than many item rows.
+- Check both kinds of golden apple: one separate Gap binded countdown.
+- Check Easter leggings: Bind and Elytra timers both start/refresh independently.
+- Hide one self category, then show it: the remaining duration should continue.
+- Let timers expire and confirm rows disappear. Test early clears if available.
+- U: switch Screen HUD / Above nametag and check the live sample preview.
+- B: search Cupid, open Costs, verify the example above and held-item levels.
+- Radius: set a known/test value and check held/worn activation on flat ground.
+Report the item name, visible result and expected duration/radius if different.
+
+VALIDATION AND BUILD
+All main/client Java sources compiled with Java 25 against the existing
+Minecraft 26.3 and Fabric dependencies. 112 new checks passed, plus the earlier
+timer, item-rule, serialization, configuration and HUD appearance checks.
+Rendering and packet mixin descriptors match Minecraft 26.3.
+This JAR was packaged from freshly compiled classes and project resources,
+using the same direct compilation approach as the previously tested versions.
+A complete Gradle build was not verified here because of the existing local
+Minecraft-cache preparation problem. The source retains its normal Gradle
+build: open in IDEA with Java 25, then run .\gradlew.bat build.
+Actual gameplay, mouse interactions and compatibility with your PvP/shader
+mods must be tested in your Minecraft instance.

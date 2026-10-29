@@ -46,6 +46,7 @@ public class NewwindUtilsClient implements ClientModInitializer {
     private static KeyMapping openConfigKey;
     private static KeyMapping registerItemKey;
     private static KeyMapping measureEffectKey;
+    private static KeyMapping itemBrowserKey;
 
     private final List<PendingHit> pendingHits = new ArrayList<>();
 
@@ -58,6 +59,7 @@ public class NewwindUtilsClient implements ClientModInitializer {
 
         registerKeybinds();
         registerHud();
+        RadiusOverlay.register();
         registerTickHandler();
         registerAttackHandler();
         registerUseEntityHandler();
@@ -131,6 +133,8 @@ public class NewwindUtilsClient implements ClientModInitializer {
                 "key.newwindutils.register_item", InputConstants.KEY_K, CATEGORY));
         measureEffectKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.newwindutils.measure_effect", InputConstants.KEY_L, CATEGORY));
+        itemBrowserKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+                "key.newwindutils.item_browser", InputConstants.KEY_B, CATEGORY));
     }
 
     private void registerHud() {
@@ -150,6 +154,7 @@ public class NewwindUtilsClient implements ClientModInitializer {
     private void registerTickHandler() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             CooldownObservations.tick(client);
+            RadiusOverlay.tick(client);
             NEARBY_INTERACTION_TRACKER.tick(
                     client,
                     WEAPON_REGISTRY,
@@ -195,6 +200,7 @@ public class NewwindUtilsClient implements ClientModInitializer {
                 CustomItemsScreen.openHeld(client.gui.screen());
             }
             while (measureEffectKey.consumeClick()) CooldownObservations.measureKey(client);
+            while (itemBrowserKey.consumeClick()) client.gui.setScreen(new ItemBrowserScreen(client.gui.screen()));
 
             Iterator<PendingHit> iterator = pendingHits.iterator();
             while (iterator.hasNext()) {

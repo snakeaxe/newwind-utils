@@ -99,8 +99,9 @@ public class NewwindUtilsConfigScreen extends Screen implements HudPreview.Editi
             list.add(number("Self HUD X",()->c.selfHudX,v->c.selfHudX=(int)Math.round(v),-1,5000,1));
             list.add(number("Self HUD Y",()->c.selfHudY,v->c.selfHudY=(int)Math.round(v),0,5000,1));
             list.add(number("HUD Scale",()->c.hudScale,v->c.hudScale=(float)v,0.5,3,0.05));
-            list.add(toggle(()->"Display Mode: "+c.timerDisplayMode.label(),()->c.timerDisplayMode=c.timerDisplayMode.next()));
+            addEffectToggles(list,c,true);
             addPanelColors(list,c);
+            list.add(toggle(()->"Raw cooldown details: "+onOff(c.showRawSelfCooldowns),()->c.showRawSelfCooldowns=!c.showRawSelfCooldowns));
             list.add(toggle(()->"Server Cooldowns: "+onOff(c.showServerCooldowns),()->c.showServerCooldowns=!c.showServerCooldowns));
             return list;
         }
@@ -140,8 +141,11 @@ public class NewwindUtilsConfigScreen extends Screen implements HudPreview.Editi
             list.add(toggle(()->"Background: "+onOff(c.nametagBackground),()->c.nametagBackground=!c.nametagBackground));
             if(c.nametagBackground) list.add(number("Background Opacity",()->c.nametagBackgroundOpacity,v->c.nametagBackgroundOpacity=(int)Math.round(v),0,255,1));
         }
+        addEffectToggles(list,c,false);
         list.add(toggle(()->"Self HUD settings",openSelf));
         list.add(toggle(()->"Custom Items / Measurements",openItems));
+        list.add(toggle(()->"God Item Browser / Costs (B)",()->net.minecraft.client.Minecraft.getInstance().gui.setScreen(new ItemBrowserScreen(net.minecraft.client.Minecraft.getInstance().gui.screen()))));
+        list.add(toggle(()->"Effect Radius Guides",()->RadiusSettings.openGeneral(net.minecraft.client.Minecraft.getInstance().gui.screen())));
         list.add(number("Max Players Shown",()->c.maxTargetsShown,v->c.maxTargetsShown=(int)Math.round(v),1,8,1));
         list.add(toggle(()->"Only Yours On Others: "+onOff(c.showOnlyLocalInflictedOnTargets),()->c.showOnlyLocalInflictedOnTargets=!c.showOnlyLocalInflictedOnTargets));
         list.add(toggle(()->"Only Self Effects: "+onOff(c.showOnlySelfTimers),()->c.showOnlySelfTimers=!c.showOnlySelfTimers));
@@ -149,6 +153,12 @@ public class NewwindUtilsConfigScreen extends Screen implements HudPreview.Editi
         list.add(number("Focus Cone",()->c.focusMinDot,v->c.focusMinDot=v,0.15,0.95,0.01));
         list.add(number("Distance Weight",()->c.focusDistanceWeight,v->c.focusDistanceWeight=v,0,2,0.01));
         return list;
+    }
+    private static void addEffectToggles(List<Entry> list,NewwindUtilsConfig c,boolean self){
+        for(EffectKind kind:EffectKind.values())list.add(toggle(()->"Show "+kind.label+": "+onOff(kind.visible(c,self)),()->{
+            var hidden=self?c.hiddenSelfEffects:c.hiddenTargetEffects;
+            if(!hidden.remove(kind.id))hidden.add(kind.id);
+        }));
     }
     private static Entry toggle(LabelSupplier label,Runnable action) { return new Entry(label,action,null); }
     private static void addPanelColors(List<Entry> list,NewwindUtilsConfig c) {

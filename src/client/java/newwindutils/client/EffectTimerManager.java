@@ -165,9 +165,13 @@ public class EffectTimerManager {
         TargetEffectState state = targets.get(player.getUUID());
         List<ActiveEffectTimer> result = new ArrayList<>();
         if (state != null) result.addAll(state.getActiveTimers(currentGameTime));
-        if (player == Minecraft.getInstance().player && NewwindUtilsConfigManager.get().showServerCooldowns)
-            result.addAll(CooldownObservations.activeTimers(currentGameTime));
+        if (player == Minecraft.getInstance().player)
+            return CooldownObservations.selfTimers(result,NewwindUtilsConfigManager.get(),currentGameTime);
         return result;
+    }
+
+    public void clearPredictedBefore(Player player,EffectKind kind,long cutoff){
+        TargetEffectState state=targets.get(player.getUUID());if(state!=null)state.clearPredictedBefore(kind,cutoff);
     }
 
     private static Player findPlayer(List<? extends Player> players, UUID targetUuid) {
@@ -184,13 +188,10 @@ public class EffectTimerManager {
             NewwindUtilsConfig config,
             UUID localPlayerUuid
     ) {
-        if (!config.showOnlyLocalInflictedOnTargets) {
-            return timers;
-        }
-
         List<ActiveEffectTimer> filtered = new ArrayList<>();
         for (ActiveEffectTimer timer : timers) {
-            if (timer.wasAppliedBy(localPlayerUuid)) {
+            if (EffectKind.ofEffect(timer.effectId()).visible(config,false)
+                    && (!config.showOnlyLocalInflictedOnTargets || timer.wasAppliedBy(localPlayerUuid))) {
                 filtered.add(timer);
             }
         }

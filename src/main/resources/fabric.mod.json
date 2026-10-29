@@ -3,7 +3,7 @@
   "id": "newwindutils",
   "version": "${version}",
   "name": "NewwindUtils",
-  "description": "Client-side Fabric cooldown and bind tracking for Newwind, with configurable HUDs, item registration, and timing tools.",
+  "description": "Client-side Newwind bind timers, customizable HUDs, a searchable item and upgrade guide, material cost calculators, and configurable effect radius guides.",
   "authors": [
     "snakeaxe"
   ],

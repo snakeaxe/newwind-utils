@@ -1,80 +1,73 @@
 # Newwind Utils
 
-A client-side Fabric mod for tracking Newwind combat effects with customizable screen HUDs and above-nametag timers.
+Client-side Fabric utilities for Newwind: independent bind timers, customizable
+screen and above-nametag HUDs with live previews, custom item registration,
+server cooldown observations, an offline god-item browser, material cost
+calculators, and configurable ground radius guides.
 
-## Download and install
-
-Download `newwindutils-1.0.3.jar` from this repository's **Releases** section. Close Minecraft, put the JAR in your launcher instance's `mods` folder, and keep only one Newwind Utils JAR there.
-
-Requirements:
-- Minecraft Java Edition **26.3**
-- Fabric Loader **0.20.1 or newer**
-- Fabric API for Minecraft 26.3 (built against **0.165.0+26.3**)
-- Java **25**
-
-This is a client mod. Install it in your own Minecraft client.
-
-## Features
-
-- Separate **Bind**, **Elytra**, **Food**, and **Gapple** timers.
-- Easter leggings start or refresh both Bind and Elytra timers. Elytra includes what players call a clip.
-- All-food binds still include gaps; food and gapple durations are tracked independently.
-- Choose screen cards or timer text above the tracked player's nametag.
-- Screen HUD customization: position, size, player heads, palette, outlines, text shadows, bars, and seconds.
-- Nametag customization: size, height, stacked/inline layout, spacing, precision, preset/custom RGB colors, time colors, bold, shadow, and background opacity.
-- Raise nametag timers to clear cosmetic titles.
-- Live sample previews, optional animation, and a full-screen view for checking screen-panel positions without starting a fight.
-- A separate self HUD, placed in the top-right by default.
-- Register items in-game and edit, disable, or delete saved rules.
-- Record a manual effect duration from an incoming player hit.
-- Display server-reported cooldowns on your own items and reuse recent duration samples.
-- Configure target count, range, focus, and ownership filters.
+Minecraft 26.3 · Java 25 · Fabric Loader 0.20.1+ · Fabric API for 26.3.
 
 ## Controls
 
-| Key | Action |
-| --- | --- |
-| **U** | Open settings |
-| **K** | Register the item in your main hand |
-| **L** | Arm, cancel, or finish a received-effect measurement |
-| **J** | Inspect held-item custom model data |
+- U: HUD/configuration and preview
+- B: item browser, upgrade costs and per-item radius guides
+- K: register held item / custom tracking rules
+- L: arm/finish a manually confirmed timing measurement
+- J: inspect held custom model data
 
-Change conflicting bindings in Minecraft's key-binding menu under **NewwindUTILS**.
+Keys can be changed in Minecraft Controls. Existing configuration is retained.
 
-## Quick start
+## Data and limitations
 
-Press **U**. The first control selects Screen HUD or Above nametag. Only appearance controls for the selected mode are shown. Drag sliders, or double-click them to enter exact values. The preview uses sample timers and does not change your real tracked effects. Use **Full screen** to check configured screen positions. Nametag preview scale is illustrative; actual world size varies with distance.
+The item catalog is a 2026-10-29 snapshot of the [Newwind wiki](https://wiki.newwindserver.com/gods).
+Each entry retains its source URL. It contains functional summaries, enchantment
+levels and upgrade ingredient counts, not auction histories or item poems.
+Two missing detail pages are marked unavailable.
 
-To add an item, hold it and press **K**. Choose its effect, source, trigger, and duration, then save. Armor rules support chest armor and leggings. Triggers are melee hits or right-clicking a player. An optional lore line can distinguish variants sharing an item group.
+Sharpening/reinforcing prices were supplied by the player and are editable:
+Sharpness 10–20: 90 embers/level; 20–30: 90 dragon eggs/level.
+Unbreaking 0–10: 90 gold coins/level; 10–20: 90 star remnants/level.
+Four embers equal one dragon egg; 64 eggs equal one stack.
+Unspecified price ranges are labeled incomplete. Recipe quotes do not subtract
+removal refunds or estimate market prices.
 
-To measure an effect, press **L** before a player hits you and press **L** again when it ends. Under **Custom Items / Measurements**, choose a candidate from the last incoming hit, then use **Recent** to select the measurement. Additional hits may refresh an effect and are flagged in the sample.
+Effect radii are unknown by default. Enter tested values in each item's Radius
+screen. Outlines are horizontal guides and do not confirm an ability's server
+activation or full area of effect. Movement-item cooldowns are grouped as binds
+by user request, including ordinary cooldowns on those items.
 
-Read [QUICK-START.txt](QUICK-START.txt) for the complete instructions.
+## Build
 
-## Tracking accuracy
+Use Java 25, then run `./gradlew build` (Windows: `.\gradlew.bat build`).
+The output JAR is in `build/libs/`.
+See QUICK-START.txt for installation and testing instructions.
 
-Opponent timers are estimates based on visible triggers and configured durations. The client cannot query an opponent's private cooldowns or prove that a random/chance-based effect activated.
+## Version 1.1.1
 
-A standard cooldown packet gives a duration for your own affected item/group. It does not identify the weapon or armor responsible, and ordinary item reuse cooldowns may also appear. These self-HUD entries are labelled **Server:**.
+The browser opens to categories in a compact centered panel. Renamed items are
+recognized through original names, stable server metadata, or unique mechanic
+lore. An item page can explicitly associate a held item with its catalog entry.
+Saved identities do not depend on player renames or enchantment levels.
 
-Stopwatch measurements include reaction time. The duration of an effect on you can differ from the opponent's ability recharge time. Use isolated tests to confirm new item rules.
+Radius rules support HELD, WORN, INVENTORY and ALWAYS feet guides. Heliast
+uses landed-pool outlines instead of a feet guide: newly fired projectiles are
+associated with newly spawned area-cloud entities, whose actual position and
+radius are drawn independently of particle visibility. This needs verification
+with Newwind; particle-only pools cannot be detected this way.
 
-## Reporting issues
+Browser icons use matching real inventory items where available, preserving
+armor trims and custom models. Wiki trim definitions were not available.
 
-Open an issue with your Minecraft/Fabric versions, mod version, reproduction steps, and a screenshot or relevant error text. For timer reports, identify the item and effect and explain whether the duration was configured, measured manually, or reported by the server.
+## Version 1.1.2
 
-## Building
+Key detail pages have a View drops button. Drop entries open item details;
+Back restores the drop list, and Back to key restores the key page. The offline
+snapshot contains 410 explicit Obtaining links for 20 keys. Two keys without
+published matching sources have an empty list marked unavailable. Drop odds
+and undocumented loot are not invented.
 
-Use JDK 25. In the project folder run:
-
-```powershell
-.\gradlew.bat build
-```
-
-Build output is written to `build/libs/`.
-
-The supplied 1.0.3 JAR was compiled directly with Java 25 against the existing Minecraft/Fabric libraries and packaged with the project resources. Compilation and behavior checks passed. The local Gradle Minecraft-preparation issue prevented a full Gradle build in the preparation environment; visual behavior still needs player testing.
-
-## License
-
-The project retains its existing **CC0-1.0** license. See [LICENSE](LICENSE).
+Heliast outlines only pools associated with your released shot, after impact.
+It accepts normal lingering-potion area clouds, follows their actual position
+and radius, and clears the outline when the cloud disappears. Holding the bow
+alone draws nothing. Ownership is used where available, otherwise launch and
+impact proximity are used; simultaneous nearby shots can be ambiguous.

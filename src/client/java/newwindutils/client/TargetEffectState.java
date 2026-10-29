@@ -51,6 +51,10 @@ public class TargetEffectState {
         );
     }
 
+    public void clearPredictedBefore(EffectKind kind,long cutoff){
+        activeTimers.values().removeIf(t->EffectKind.ofEffect(t.effectId())==kind && t.expiresAtGameTime()-t.durationTicks()<=cutoff);
+    }
+
     public void tick(long currentGameTime) {
         Iterator<ActiveEffectTimer> iterator = activeTimers.values().iterator();
         while (iterator.hasNext()) {

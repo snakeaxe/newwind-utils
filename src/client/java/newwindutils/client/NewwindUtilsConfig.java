@@ -29,6 +29,21 @@ public class NewwindUtilsConfig {
     public int nametagColorG = 255;
     public int nametagColorB = 255;
     public boolean showServerCooldowns = true;
+    public boolean showRawSelfCooldowns = false;
+    public int sharpenEmbersPerLevel=90;
+    public int sharpenEggsPerLevel=90;
+    public int reinforceCoinsPerLevel=90;
+    public int reinforceRemsPerLevel=90;
+    public int embersPerEgg=4;
+    public int eggsPerStack=64;
+    public boolean showRadiusGuides=true;
+    public int radiusRed=255,radiusGreen=55,radiusBlue=55,radiusOpacity=210;
+    public float radiusLineWidth=2.0F;
+    public boolean showDragonBreathClouds=true;
+    public java.util.List<CatalogIdentity> catalogIdentities=new java.util.ArrayList<>();
+    public java.util.List<RadiusRule> radiusRules=new java.util.ArrayList<>();
+    public java.util.Set<String> hiddenSelfEffects = new java.util.HashSet<>(java.util.List.of("other"));
+    public java.util.Set<String> hiddenTargetEffects = new java.util.HashSet<>();
     public java.util.List<CustomItemRule> customItems = new java.util.ArrayList<>();
 
     public int hudX = 10;
@@ -82,6 +97,19 @@ public class NewwindUtilsConfig {
     public HudColorPreset colorPreset = HudColorPreset.OCEAN;
 
     public void clamp() {
+        sharpenEmbersPerLevel=clampInt(sharpenEmbersPerLevel,0,1000000);
+        sharpenEggsPerLevel=clampInt(sharpenEggsPerLevel,0,1000000);
+        reinforceCoinsPerLevel=clampInt(reinforceCoinsPerLevel,0,1000000);
+        reinforceRemsPerLevel=clampInt(reinforceRemsPerLevel,0,1000000);
+        embersPerEgg=clampInt(embersPerEgg,1,1000000);eggsPerStack=clampInt(eggsPerStack,1,1000000);
+        radiusRed=clampInt(radiusRed,0,255);radiusGreen=clampInt(radiusGreen,0,255);radiusBlue=clampInt(radiusBlue,0,255);radiusOpacity=clampInt(radiusOpacity,0,255);
+        if(!Float.isFinite(radiusLineWidth))radiusLineWidth=2;radiusLineWidth=clampFloat(radiusLineWidth,1,6);
+        if(catalogIdentities==null)catalogIdentities=new java.util.ArrayList<>();
+        catalogIdentities.removeIf(v->v==null || !v.valid());
+        if(radiusRules==null)radiusRules=new java.util.ArrayList<>();
+        radiusRules.removeIf(r->r==null || !r.valid());
+        if(hiddenSelfEffects==null)hiddenSelfEffects=new java.util.HashSet<>(java.util.List.of("other"));
+        if(hiddenTargetEffects==null)hiddenTargetEffects=new java.util.HashSet<>();
         if (!Float.isFinite(nametagScale)) nametagScale = 1.0F;
         nametagScale = clampFloat(nametagScale, 0.5F, 3.0F);
         nametagLineSpacing = clampInt(nametagLineSpacing, 0, 12);

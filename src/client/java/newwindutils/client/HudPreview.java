@@ -42,7 +42,7 @@ public final class HudPreview {
         if(!compact) g.centeredText(client.font,"Fitted to panel",x+width/2,y+21,0xFF9FAFC6);
         int top=y+(compact?21:36),available=Math.max(5,height-(compact?54:69));
         g.enableScissor(x+3,top,x+width-3,top+available);
-        List<ActiveEffectTimer> timers=state.timers();
+        List<ActiveEffectTimer> timers=previewTimers(state.timers(),config,self);
         if(self) {
             var size=NewwindUtilsSelfHud.measure(client,timers,0,config);
             float scale=fit(config.hudScale,size.width(),size.height(),width-14,available-4);
@@ -63,6 +63,9 @@ public final class HudPreview {
             pose.popMatrix();
         } else drawNametagScene(g,client,x+7,top,width-14,available,config,timers);
         g.disableScissor();
+    }
+    static List<ActiveEffectTimer> previewTimers(List<ActiveEffectTimer> timers,NewwindUtilsConfig config,boolean self){
+        return self?SelfEffectSummary.preview(timers,config):timers.stream().filter(t->EffectKind.ofEffect(t.effectId()).visible(config,false)).toList();
     }
     static float fit(float desired,float contentWidth,float contentHeight,float width,float height) {
         return Math.max(0.01F,Math.min(desired,Math.min(Math.max(1,width)/Math.max(1,contentWidth),
@@ -121,7 +124,7 @@ public final class HudPreview {
         @Override public void onClose(){minecraft.gui.setScreen(parent);}
         @Override public void extractRenderState(GuiGraphicsExtractor g,int x,int y,float partialTick) {
             var config=NewwindUtilsConfigManager.get();
-            var timers=state.timers();
+            var timers=previewTimers(state.timers(),config,self);
             if(self) NewwindUtilsSelfHud.renderSampleOnScreen(g,minecraft,timers,0,config);
             else if(config.targetHudMode==NewwindUtilsConfig.TargetHudMode.SCREEN) {
                 var pose=g.pose();pose.pushMatrix();pose.scale(config.hudScale,config.hudScale);

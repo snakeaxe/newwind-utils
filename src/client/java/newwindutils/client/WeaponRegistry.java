@@ -22,7 +22,7 @@ public class WeaponRegistry {
 
     private static final String EFFECT_BIND = "bind";
     private static final String EFFECT_SUCC = "succ";
-    private static final String EFFECT_ACROPSIS = "acropsis";
+    private static final String EFFECT_ACROPSIS = "elytra_bind";
     private static final String EFFECT_CLIP = "clip";
 
     // Items are recognised by their "use cooldown group", which NewWind sets on every custom item
@@ -109,7 +109,7 @@ public class WeaponRegistry {
                 "acropsis_upgraded",
                 "Acropsis+",
                 EFFECT_ACROPSIS,
-                "Acropsis",
+                "Elytra",
                 ACROPSIS_CMD,
                 INCREASED_BIND_TIME_LORE,
                 config.acropsisUpgradedDurationTicks,
@@ -122,7 +122,7 @@ public class WeaponRegistry {
                 "acropsis",
                 "Acropsis",
                 EFFECT_ACROPSIS,
-                "Acropsis",
+                "Elytra",
                 ACROPSIS_CMD,
                 null,
                 config.acropsisDurationTicks,
